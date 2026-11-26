@@ -1,49 +1,104 @@
-import 'package:http/http.dart' as http;
 import 'package:material_ui/material_ui.dart';
 
-import 'album.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
+void main() {
+  runApp(const MyApp());
 }
 
-class _MyAppState extends State<MyApp> {
-  late Future<Album> futureAlbum;
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // TRY THIS: Try running your application with "flutter run". You'll see
+        // the application has a purple toolbar. Then, without quitting the app,
+        // try changing the seedColor in the colorScheme below to Colors.green
+        // and then invoke "hot reload" (save your changes or press the "hot
+        // reload" button in a Flutter-supported IDE, or press "r" if you used
+        // the command line to start the app).
+        //
+        // Notice that the counter didn't reset back to zero; the application
+        // state is not lost during the reload. To reset the state, use hot
+        // restart instead.
+        //
+        // This works for code too, not just values: Most code changes can be
+        // tested with just a hot reload.
+        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const CounterPage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class CounterPage extends StatefulWidget {
+  const CounterPage({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
+  @override
+  State<CounterPage> createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  late TextEditingController nameController;
+  int? number;
   @override
   void initState() {
     super.initState();
-    futureAlbum = fetchAlbum(http.Client());
+    nameController = TextEditingController();
+  }
+
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+      number = int.parse(nameController.text) * int.parse(nameController.text);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fetch Album Example',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
       ),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Fetch Album Example')),
-        body: Center(
-          child: FutureBuilder<Album>(
-            future: futureAlbum,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.title);
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
+      body: Center(
+        child: Column(
+          mainAxisAlignment: .center,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(labelText: 'Enter your name'),
+            ),
 
-              return const CircularProgressIndicator();
-            },
-          ),
+            Text(number.toString()),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }
